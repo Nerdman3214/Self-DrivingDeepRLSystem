@@ -1,0 +1,74 @@
+# Version control ignores
+
+# Python
+python/venv/
+python/__pycache__/
+python/rl/__pycache__/
+python/rl/**/__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+*.egg
+
+# Training artifacts
+python/logs/
+python/runs/
+python/wandb/
+*.pt
+*.pth
+
+# But keep example models
+!models/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# C++
+cpp/build/
+*.o
+*.a
+*.dylib
+
+# Java
+java/build/
+java/.gradle/
+java/bin/
+java/out/
+*.class
+*.jar
+!java/gradle/wrapper/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# Logs
+*.log
+logs/
+
+# ONNX models (large files)
+*.onnx
+
+# TensorBoard
+runs/
+events.out.tfevents.*
+
+# Temp
+tmp/
+temp/
+*.tmp
+*.temp

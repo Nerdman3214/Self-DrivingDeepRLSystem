@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-12-25T20:39:22.488008",
+  "policy_checkpoint": "random_policy",
+  "num_episodes": 1,
+  "determinism_hash": "c0bdfb5d12fcb7f7",
+  "performance": {
+    "mean_episode_reward": -7.791421860456467,
+    "median_episode_reward": -7.791421860456467,
+    "std_episode_reward": 0.0,
+    "mean_episode_length": 4.0,
+    "median_episode_length": 4.0,
+    "total_episodes": 1
+  },
+  "safety": {
+    "max_lane_deviation": 0.23105742037296295,
+    "mean_lane_deviation": 0.18567414581775665,
+    "safety_interventions_per_episode": 0.0,
+    "total_safety_interventions": 0,
+    "emergency_brakes_per_episode": 0.0,
+    "total_emergency_brakes": 0,
+    "action_saturation_rate": 0.0,
+    "worst_case_deviation": 0.23105742037296295
+  },
+  "comfort": {
+    "mean_steering_jerk": 0.00018953475228045136,
+    "max_steering_jerk": 0.0002557472907938063,
+    "mean_throttle_jerk": 0.00015802330744918436,
+    "max_throttle_jerk": 0.0003943159244954586,
+    "oscillation_frequency": 0.0
+  },
+  "is_safe": true,
+  "is_deterministic": true,
+  "has_numerical_issues": false,
+  "episodes_evaluated": [
+    "episodes/episode_0000_20251225_202226.json.gz"
+  ],
+  "evaluation_config": {
+    "safety_thresholds": {
+      "max_lane_deviation": 1.5,
+      "max_intervention_rate": 0.3,
+      "max_emergency_brake_rate": 0.1
+    },
+    "determinism_check": true
+  }
+}

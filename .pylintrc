@@ -1,0 +1,40 @@
+# Pylint configuration for Self-Driving RL System
+
+[MESSAGES CONTROL]
+# Disable specific warnings that are false positives or intentional
+disable=
+    # cv2 is dynamically loaded - pylint can't detect members
+    no-member,
+    # Attributes defined outside __init__ is intentional for lazy initialization
+    attribute-defined-outside-init,
+    # Catching general Exception is sometimes necessary
+    broad-except,
+    # Unnecessary pass statements in abstract methods are for clarity
+    unnecessary-pass,
+    # Some imports are used via string names or conditionally
+    unused-import
+
+[BASIC]
+# Allow single-character variable names (common in ML: x, y, i, etc.)
+good-names=i,j,k,x,y,z,f,_
+
+# Allow longer variable names
+variable-rgx=[a-z_][a-z0-9_]{1,30}$
+
+[FORMAT]
+# Maximum line length
+max-line-length=120
+
+[DESIGN]
+# Maximum number of arguments
+max-args=10
+
+# Maximum number of attributes
+max-attributes=15
+
+[TYPECHECK]
+# Modules for which member attributes should not be checked
+ignored-modules=cv2,pygame,onnx,onnxruntime
+
+# Classes for which member attributes should not be checked
+ignored-classes=cv2,pygame,onnx,onnxruntime
