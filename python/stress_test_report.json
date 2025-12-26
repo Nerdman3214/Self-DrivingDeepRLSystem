@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-12-26T15:28:39.051021",
+  "scenarios": [
+    {
+      "name": "baseline",
+      "description": "Normal conditions (baseline)",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -45.80706024169922,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "slippery_road",
+      "description": "Reduced friction (ice-like conditions)",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -66.07705688476562,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "noisy_sensors",
+      "description": "Sensor noise (observation perturbations)",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -66.28445434570312,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "random_pushes",
+      "description": "Random external forces",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -56.32762908935547,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "difficult_start",
+      "description": "Off-center initial positions",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -45.630332946777344,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "narrow_lane",
+      "description": "Narrow lane (2.5m instead of 3.5m)",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -53.73148727416992,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    },
+    {
+      "name": "combined_stress",
+      "description": "Multiple stressors combined",
+      "success_rate": 0.0,
+      "collision_rate": 0.0,
+      "avg_reward": -115.69792175292969,
+      "avg_episode_length": 45.0,
+      "recovery_time": 0.0
+    }
+  ],
+  "overall_robustness": 0.0
+}

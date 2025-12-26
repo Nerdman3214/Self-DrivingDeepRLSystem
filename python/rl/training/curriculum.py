@@ -70,20 +70,30 @@ class CurriculumScheduler:
         self,
         stages: Optional[list[CurriculumStage]] = None,
         patience: int = 100,
-        performance_window: int = 50
+        performance_window: int = 50,
+        curriculum_type: str = 'default',
+        initial_stage: int = 0
     ):
         """
         Args:
             stages: Custom curriculum stages (uses default if None)
             patience: Episodes to wait after meeting threshold
             performance_window: Window for computing average reward
+            curriculum_type: 'default' or 'traffic' (ignored if stages provided)
+            initial_stage: Starting stage index
         """
-        self.stages = stages or self._create_default_curriculum()
+        if stages is None:
+            if curriculum_type == 'traffic':
+                stages = self._create_traffic_curriculum()
+            else:
+                stages = self._create_default_curriculum()
+        
+        self.stages = stages
         self.patience = patience
         self.performance_window = performance_window
         
         # State tracking
-        self.current_stage_idx = 0
+        self.current_stage_idx = initial_stage
         self.episode_rewards = []
         self.episodes_in_stage = 0
         self.episodes_above_threshold = 0

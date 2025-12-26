@@ -46,6 +46,7 @@ class StressTestWrapper(gym.Wrapper):
     def __init__(
         self,
         env: gym.Env,
+        scenario: Optional[str] = None,
         friction_multiplier: float = 1.0,
         observation_noise_std: float = 0.0,
         random_push_prob: float = 0.0,
@@ -56,6 +57,7 @@ class StressTestWrapper(gym.Wrapper):
         """
         Args:
             env: Base environment
+            scenario: Predefined scenario name ('slippery', 'noisy_sensors', etc.)
             friction_multiplier: Multiply friction (< 1.0 = slippery)
             observation_noise_std: Gaussian noise std for observations
             random_push_prob: Probability of random lateral push each step
@@ -64,6 +66,16 @@ class StressTestWrapper(gym.Wrapper):
             lane_width_multiplier: Multiply lane width (< 1.0 = narrow)
         """
         super().__init__(env)
+        
+        # Apply scenario presets if provided
+        if scenario is not None:
+            config = self._get_scenario_config(scenario)
+            friction_multiplier = config.get('friction_multiplier', friction_multiplier)
+            observation_noise_std = config.get('observation_noise_std', observation_noise_std)
+            random_push_prob = config.get('random_push_prob', random_push_prob)
+            random_push_force = config.get('random_push_force', random_push_force)
+            initial_offset_range = config.get('initial_offset_range', initial_offset_range)
+            lane_width_multiplier = config.get('lane_width_multiplier', lane_width_multiplier)
         
         self.friction_multiplier = friction_multiplier
         self.observation_noise_std = observation_noise_std
@@ -76,6 +88,25 @@ class StressTestWrapper(gym.Wrapper):
         self.perturbations_applied = 0
         self.recovery_times = []
         self.last_perturbation_step = None
+    
+    def _get_scenario_config(self, scenario: str) -> Dict[str, Any]:
+        """Map scenario name to configuration"""
+        scenarios = {
+            'baseline': {},
+            'slippery': {'friction_multiplier': 0.3},
+            'noisy_sensors': {'observation_noise_std': 0.1},
+            'random_pushes': {'random_push_prob': 0.05, 'random_push_force': 50.0},
+            'difficult_starts': {'initial_offset_range': 1.0},
+            'narrow_lanes': {'lane_width_multiplier': 0.7},
+            'combined_stress': {
+                'friction_multiplier': 0.4,
+                'observation_noise_std': 0.08,
+                'random_push_prob': 0.03,
+                'random_push_force': 30.0,
+                'lane_width_multiplier': 0.8
+            }
+        }
+        return scenarios.get(scenario, {})
     
     def reset(self, **kwargs):
         """Reset with stress conditions"""
@@ -369,3 +400,101 @@ class StressTestSuite:
                   f"(degradation: {degradation:+5.1f}%)")
         
         print("="*70)
+    
+    def _export_report(self, results: Dict[str, StressTestResult]) -> Dict[str, Any]:
+        """Export results as JSON-serializable dictionary"""
+        from datetime import datetime
+        
+        baseline = results.get('baseline')
+        overall_robustness = np.mean([r.success_rate for r in results.values()]) if results else 0.0
+        
+        return {
+            'timestamp': datetime.now().isoformat(),
+            'scenarios': [
+                {
+                    'name': name,
+                    'description': self.scenarios[name]['description'],
+                    'success_rate': float(result.success_rate),
+                    'collision_rate': float(result.collision_rate),
+                    'avg_reward': float(result.avg_reward),
+                    'avg_episode_length': float(result.avg_episode_length),
+                    'recovery_time': float(result.recovery_time_avg)
+                }
+                for name, result in results.items()
+            ],
+            'overall_robustness': float(overall_robustness)
+        }
+
+
+# CLI Interface
+def main():
+    """Command-line interface for stress testing"""
+    import argparse
+    import torch
+    from datetime import datetime
+    
+    parser = argparse.ArgumentParser(
+        description="Run stress tests on trained policy"
+    )
+    parser.add_argument(
+        "--checkpoint",
+        type=str,
+        required=True,
+        help="Path to policy checkpoint"
+    )
+    parser.add_argument(
+        "--episodes",
+        type=int,
+        default=10,
+        help="Episodes per scenario"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        help="Path to save JSON report"
+    )
+    
+    args = parser.parse_args()
+    
+    # Import dependencies
+    from rl.envs.pybullet_driving_env import PyBulletDrivingEnv
+    from rl.networks.mlp_policy import MLPActorCritic
+    import json
+    
+    print(f"Loading checkpoint: {args.checkpoint}")
+    checkpoint = torch.load(args.checkpoint, map_location='cpu')
+    
+    # Create policy
+    env = PyBulletDrivingEnv(render_mode=None)
+    hyperparams = checkpoint.get('hyperparameters', {})
+    policy = MLPActorCritic(
+        observation_dim=env.observation_space.shape[0],
+        action_dim=env.action_space.shape[0],
+        hidden_dims=hyperparams.get('hidden_dims', (64, 64))
+    )
+    env.close()
+    
+    # Load weights
+    policy.load_state_dict(checkpoint['policy_state_dict'])
+    policy.eval()
+    
+    print("Creating stress test suite...")
+    suite = StressTestSuite(
+        base_env_factory=lambda: PyBulletDrivingEnv(render_mode=None)
+    )
+    
+    print(f"Running stress tests ({args.episodes} episodes per scenario)...")
+    results = suite.run_full_suite(policy, num_episodes_per_scenario=args.episodes)
+    
+    print("\n" + "="*70)
+    suite._print_summary(results)
+    
+    if args.output:
+        report = suite._export_report(results)
+        with open(args.output, 'w') as f:
+            json.dump(report, f, indent=2)
+        print(f"\nReport saved: {args.output}")
+
+
+if __name__ == "__main__":
+    main()

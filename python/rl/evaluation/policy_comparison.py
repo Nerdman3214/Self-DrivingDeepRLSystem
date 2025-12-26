@@ -143,9 +143,15 @@ class PolicyComparator:
         """Load policy from checkpoint"""
         # Create policy instance
         env = self.env_factory()
+        
+        # Extract hyperparameters from checkpoint if available
+        hyperparams = checkpoint.metadata.get('hyperparameters', {})
+        hidden_dims = hyperparams.get('hidden_dims', (64, 64))  # Default for old checkpoints
+        
         policy = self.policy_class(
             observation_dim=env.observation_space.shape[0],
-            action_dim=env.action_space.shape[0]
+            action_dim=env.action_space.shape[0],
+            hidden_dims=hidden_dims
         )
         env.close()
         

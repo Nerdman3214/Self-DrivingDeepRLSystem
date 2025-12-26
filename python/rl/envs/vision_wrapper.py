@@ -137,8 +137,11 @@ class VisionWrapper(gym.ObservationWrapper):
             renderer=p.ER_BULLET_HARDWARE_OPENGL
         )
         
-        # Extract RGB
+        # Extract RGB - handle both 1D and 3D array formats
         rgb_array = np.array(px, dtype=np.uint8)
+        if rgb_array.ndim == 1:
+            # Reshape flat array to (height, width, 4)
+            rgb_array = rgb_array.reshape((height, width, 4))
         rgb_array = rgb_array[:, :, :3]  # Remove alpha channel
         
         return rgb_array
